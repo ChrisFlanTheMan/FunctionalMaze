@@ -1,0 +1,8 @@
+Variation of:
+https://www.reddit.com/r/dailyprogrammer/comments/5mzr6x/20170109_challenge_298_hard_functional_maze/
+
+Instead of finding the best possible path through all the nodes via exploration, 
+I used A* with an approach heuristic to attempt to find the most optimal path at a minimal cost
+
+You can also use exploration to find all of the costs between each node via constant neighbour search
+And run dijkstra's algorithm to get the optimal path
