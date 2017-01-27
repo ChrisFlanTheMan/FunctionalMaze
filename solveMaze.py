@@ -15,8 +15,8 @@ class Neighbour:
 	def __init__(self, x, y, score, gScore):
 		self.x = x
 		self.y = y
-		self.score = score
-		self.gScore = gScore
+		self.score = score # f-score
+		self.gScore = gScore # g-score
 
 # Return matching node by name
 def getNode(name, nodes):
@@ -53,7 +53,10 @@ def getNodes(maze):
 # Calculated the coordinate distance between two points
 # Used for the heuristic calculation during A*
 def distCalc(x, y, node):
-	return math.sqrt(math.pow(node.x - x, 2) + math.pow(node.y - y, 2))	
+	#Used Manhattan distance
+	return abs(x - node.x) + abs(y - node.y)
+
+	#return math.sqrt(math.pow(node.x - x, 2) + math.pow(node.y - y, 2))	
 
 # Calculates the best node candidate to search for next
 # by using the heuristic distance calculation
@@ -84,8 +87,6 @@ def findShortestPaths(start, nodes, maze):
 
 	i = 0
 	while nodesToVisit > 0:
-		adjacencyNodes[int(start.name)][int(start.name)] = 0
-
 		# Keeps track of visited maze locations as well as
 		# neighbours that are to be consider
 		visited = []
@@ -93,38 +94,16 @@ def findShortestPaths(start, nodes, maze):
 		openSet = []
 
 		# Find the next node to search for based on heuristic
-		goal = bestNodeEstimate(start, nodes);
+		goal = bestNodeEstimate(start, nodes);	
 
-		# Initialize g-scores
-		gScore = []
-		for x in maze:
-			row = []
-			for y in x:
-				val = None
-				row.append(val)
-			gScore.append(row)
-
-		gScore[start.x][start.y] = 0
-
-		# Initialize f-scores
-		fScore = []
-		for x in maze:
-			row = []
-			for y in x:
-				val = None
-				row.append(val)
-			fScore.append(row)		
-
-		fScore[start.x][start.y] = distCalc(start.x, start.y, goal)
-
-		openSet.append(Neighbour(start.x, start.y, fScore[start.x][start.y], 0))
+		openSet.append(Neighbour(start.x, start.y, distCalc(start.x, start.y, goal), 0))
 		closedSet.append((start.x, start.y))
 		
 		# Search until you find the goal node
 		while len(openSet) > 0:
 			nextNeighbourToVisit = None
 
-			# Visit the neigh with the lowest f(x) value next
+			# Visit the neighbour with the lowest f(x) value next
 			for x in openSet:
 				if nextNeighbourToVisit == None or x.score < nextNeighbourToVisit.score:
 					nextNeighbourToVisit = x
@@ -140,8 +119,6 @@ def findShortestPaths(start, nodes, maze):
 			# Check if we find the goal and update the adjacency matrix
         		if maze[posX][posY] == goal.name:
         			print "-> " + goal.name,
-        			adjacencyNodes[int(start.name)][int(goal.name)] = nextNeighbourToVisit.gScore
-        			adjacencyNodes[int(goal.name)][int(start.name)] = nextNeighbourToVisit.gScore
         			nodesToVisit -= 1   	
         			i += nextNeighbourToVisit.gScore
         			start = goal
@@ -150,7 +127,6 @@ def findShortestPaths(start, nodes, maze):
 
         	# Otherwise add neighbours into next nodes to visit 
         		for x, y in [(posX-1, posY), (posX+1, posY), (posX, posY-1), (posX, posY+1)]:
-        			#print "checking " + str(x) + " " + str(y) + " which has " + maze[x][y]
         			if maze[x][y] == '#' or (x, y) in closedSet or (x, y) in visited:
         				continue
         			else:
@@ -169,7 +145,7 @@ def main():
 	maze = getMaze()
 	nodes = getNodes(maze)
 	startNode = getNode(start, nodes)
-	adjacencyNodes = findShortestPaths(startNode, nodes, maze)
+	findShortestPaths(startNode, nodes, maze)
 
 # Run main function
 main()
